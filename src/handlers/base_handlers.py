@@ -13,8 +13,9 @@ async def start(message: Message):
 
 
 @base_router.message(Command('info'))
-async def start(message: Message):
+async def info(message: Message):
     """Команда вывода информации о боте"""
     text = ('Я - бот модератор.\n'
             'Моя функция наказывать тех пользователей, что нарушают правила поведения в группе.')
     await message.answer(text=text)
+
