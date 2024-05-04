@@ -1,15 +1,17 @@
+import json
+
+
 async def get_profanity_wordlist() -> list:
-    """Возвращает отсортированный список с недопустимыми словами из файла"""
-    with open('utils/profanity.txt', 'r') as f:
-        profanity_list = [word.lower().strip() for word in f]
-        return sorted(profanity_list)
+    """Возвращает список с недопустимыми словами из файла"""
+    with open('utils/profanity.json', 'r') as f:
+        profanity_list = json.load(f)
+        return profanity_list
 
 
-async def sort_file_wordlist(wordlist: list) -> None:
+async def add_wordlist_to_file(wordlist: list) -> None:
     """Функция записывает отсортированный список слов в файл"""
-    with open('utils/profanity.txt', 'w') as f:
-        for word in wordlist:
-            f.write(word + "\n")
+    with open('utils/profanity.json', 'w') as f:
+        json.dump(sorted(wordlist), f, ensure_ascii=False, indent=4)
 
 
 async def check_word_in_file(data: str) -> list | None:
@@ -24,7 +26,7 @@ async def check_word_in_file(data: str) -> list | None:
             profanity_list.append(moderate_word)
 
     if len_old_list != len(profanity_list):
-        return sorted(profanity_list)
+        return profanity_list
     else:
         return None
 
@@ -33,6 +35,4 @@ async def put_new_words_to_file(data: str) -> None:
     """Добавляет новые данные в файл"""
     wordlist = await check_word_in_file(data=data)
     if wordlist:
-        await sort_file_wordlist(wordlist=wordlist)
-    else:
-        pass
+        await add_wordlist_to_file(wordlist=wordlist)

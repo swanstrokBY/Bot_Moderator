@@ -8,7 +8,7 @@ from aiogram.types import Message, ChatPermissions
 from aiogram.exceptions import TelegramBadRequest
 from dotenv import load_dotenv
 
-from src.utils import get_profanity_wordlist, sort_file_wordlist
+from src.utils import get_profanity_wordlist, add_wordlist_to_file
 
 load_dotenv()
 
@@ -25,7 +25,7 @@ async def sort_profanity_file(message: Message, bot: Bot):
     """Хэндлер сортирующий список недопустимых слов в файле"""
     await message.delete()
     wordlist = await get_profanity_wordlist()
-    await sort_file_wordlist(wordlist=wordlist)
+    await add_wordlist_to_file(wordlist=wordlist)
     await bot.send_message(chat_id=admin_id,
                            text='Список недопустимых слов в файле отсортирован ☑️')
 
