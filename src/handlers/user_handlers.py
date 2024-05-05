@@ -5,29 +5,19 @@ from filters import ProfinityFilter, LenMessageFilter, LinksFilter
 
 user_router = Router()
 
+user_router.message.filter(
+    F.chat.type.in_({"supergroup", "group"}),
+    ProfinityFilter(),
+    LinksFilter(),
+    LenMessageFilter()
+)
 
 @user_router.message(F.media_group_id, F.photo)
 async def filter_photo_handler(message: Message, bot: Bot):
     pass
 
 
-@user_router.message(F.text, LinksFilter())
-async def links_filter_handler(message: Message, bot: Bot):
-    """Проверяет есть ли ссылки в сообщении"""
+@user_router.message(F.text)
+async def text_handler(message: Message, bot: Bot) -> None:
     await bot.send_message(chat_id=message.from_user.id,
-                           text='⚠️ В вашем сообщении содержатся ссылки! ⚠️')
-    # await message.delete()
-
-
-@user_router.message(F.text, ProfinityFilter())
-async def profinity_handler(message: Message, bot: Bot):
-    await bot.send_message(chat_id=message.from_user.id,
-                           text='🤬 Не ругайся!')
-    await message.delete()
-
-
-@user_router.message(F.text, LenMessageFilter())
-async def len_msg_check_handler(message: Message, bot: Bot):
-    await bot.send_message(chat_id=message.from_user.id,
-                           text='⚠️ Количество символов в сообщении превышает допустимую норму (800) ⚠️')
-    await message.delete()
+                           text='Ваше сообщение добавлено в группу.')
