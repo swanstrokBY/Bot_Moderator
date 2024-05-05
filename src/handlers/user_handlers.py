@@ -1,25 +1,33 @@
 from aiogram import Router, Bot, F
-from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
-from pymorphy2 import MorphAnalyzer
-
-from src.utils import get_profanity_wordlist
+from filters import ProfinityFilter, LenMessageFilter, LinksFilter
 
 user_router = Router()
-morph = MorphAnalyzer(lang="ru")
 
 
-@user_router.message(F.text)
-async def profinity_filter(message: Message, bot: Bot):
-    """Проверяет сообщение на недопустимые слова и если таковые имеются, отправляет пользователю предупреждение"""
-    profanity_list = await get_profanity_wordlist()
-    message_word_list = message.text.lower().strip().split()
+@user_router.message(F.media_group_id, F.photo)
+async def filter_photo_handler(message: Message, bot: Bot):
+    pass
 
-    for word in message_word_list:
-        word = word.strip(' !,?.\t\n')
-        parsed_word = morph.parse(word)[0]
-        normal_form = parsed_word.normal_form
 
-        if normal_form in profanity_list:
-            return await message.answer("🤬 Не ругайся!")
+@user_router.message(F.text, LinksFilter())
+async def links_filter_handler(message: Message, bot: Bot):
+    """Проверяет есть ли ссылки в сообщении"""
+    await bot.send_message(chat_id=message.from_user.id,
+                           text='⚠️ В вашем сообщении содержатся ссылки! ⚠️')
+    # await message.delete()
+
+
+@user_router.message(F.text, ProfinityFilter())
+async def profinity_handler(message: Message, bot: Bot):
+    await bot.send_message(chat_id=message.from_user.id,
+                           text='🤬 Не ругайся!')
+    await message.delete()
+
+
+@user_router.message(F.text, LenMessageFilter())
+async def len_msg_check_handler(message: Message, bot: Bot):
+    await bot.send_message(chat_id=message.from_user.id,
+                           text='⚠️ Количество символов в сообщении превышает допустимую норму (800) ⚠️')
+    await message.delete()

@@ -94,7 +94,8 @@ async def mute(message: Message, bot: Bot, command: CommandObject | None = None)
                                        user_id=reply.from_user.id,
                                        until_date=datetime_until_mute,
                                        permissions=ChatPermissions(
-                                           can_send_messages=False
+                                           can_send_messages=False,
+                                           can_send_photos=False
                                        )
                                        )
 
@@ -119,7 +120,8 @@ async def unmute(message: Message, bot: Bot, command: CommandObject | None = Non
         await bot.restrict_chat_member(chat_id=message.chat.id,
                                        user_id=user_id,
                                        permissions=ChatPermissions(
-                                           can_send_messages=True
+                                           can_send_messages=True,
+                                           can_send_photos=True
                                        )
                                        )
 
