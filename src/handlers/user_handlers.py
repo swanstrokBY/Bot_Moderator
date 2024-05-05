@@ -1,7 +1,7 @@
 from aiogram import Router, Bot, F
 from aiogram.types import Message
 
-from filters import ProfinityFilter, LenMessageFilter, LinksFilter
+from filters import ProfinityFilter, LinksFilter, LenMessageFilter
 
 user_router = Router()
 
@@ -12,9 +12,11 @@ user_router.message.filter(
     LenMessageFilter()
 )
 
-@user_router.message(F.media_group_id, F.photo)
-async def filter_photo_handler(message: Message, bot: Bot):
-    pass
+
+@user_router.message(F.media_group_id)
+async def filter_photo_handler(message: Message):
+    content = message.content_type
+    print(content)
 
 
 @user_router.message(F.text)

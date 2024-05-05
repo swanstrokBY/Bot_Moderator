@@ -1,6 +1,7 @@
 import re
 
 from aiogram import Bot
+from aiogram.enums import ContentType
 from aiogram.filters import Filter
 from aiogram.types import Message
 from pymorphy2 import MorphAnalyzer
@@ -15,11 +16,13 @@ class ProfinityFilter(Filter):
 
     async def __call__(self, message: Message, bot: Bot) -> bool:
         profanity_list = await get_profanity_wordlist()
+        text = ''
 
-        if message.text:
+        if message.content_type == ContentType.TEXT:
             text = message.text.lower().strip().split()
-        else:
-            text = message.caption.lower().strip().split()
+        elif message.content_type == ContentType.PHOTO:
+            if message.caption:
+                text = message.caption.lower().strip().split()
 
         for word in text:
             word = word.strip(' !,?.\t\n')
@@ -42,10 +45,12 @@ class LenMessageFilter(Filter):
         self.max_len = 8
 
     async def __call__(self, message: Message, bot: Bot) -> bool:
-        if message.text:
+        text = ''
+        if message.content_type == ContentType.TEXT:
             text = message.text
-        else:
-            text = message.caption
+        elif message.content_type == ContentType.PHOTO:
+            if message.caption:
+                text = message.caption
 
         if len(text) < self.max_len:
             return True
@@ -64,10 +69,12 @@ class LinksFilter(Filter):
         self.pattern = r'(?:https?://|www\.)\w+\.\w+(?:/\w+)*/?'
 
     async def __call__(self, message: Message, bot: Bot) -> bool:
-        if message.text:
+        text = ''
+        if message.content_type == ContentType.TEXT:
             text = message.text
-        else:
-            text = message.caption
+        elif message.content_type == ContentType.PHOTO:
+            if message.caption:
+                text = message.caption
 
         links_list = re.findall(self.pattern, text, flags=re.IGNORECASE)
 
